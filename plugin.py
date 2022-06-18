@@ -1,11 +1,10 @@
 import sublime
 
 from LSP.plugin import AbstractPlugin, register_plugin, unregister_plugin
-from LSP.plugin.core.typing import Any, Optional, Tuple, Union
+from LSP.plugin.core.typing import Any, Optional, Union
 
 from shutil import which, copyfileobj
 from urllib.request import urlopen
-from urllib.error import URLError
 import os
 import stat
 import re
@@ -16,12 +15,7 @@ TAG = '1.3.0'
 LSP_KOTLIN_BASE_URL = 'https://github.com/fwcd/kotlin-language-server/releases/download/{tag}/server.zip'
 SETTINGS_FILENAME = 'LSP-kotlin.sublime-settings'
 
-LIBRAR_DIR = 'lib'
-DATA_DIR = 'data'
 SESSION_NAME = 'kotlin'
-
-
-RE_VER = re.compile(r'Version\s+((?:\d+\.){2}\d+)')
 
 
 class Kotlin(AbstractPlugin):
@@ -72,6 +66,9 @@ class Kotlin(AbstractPlugin):
 
     @classmethod
     def install_or_update(cls) -> None:
+        if not cls._is_java_installed():
+            raise Exception('Java not installed')
+
         os.makedirs(cls.basedir(), exist_ok=True)
         download_kotlin_language_server(tag=cls.server_version(), dst=cls.basedir())
         with open(os.path.join(cls.basedir(), 'VERSION'), 'w') as fp:
@@ -80,18 +77,13 @@ class Kotlin(AbstractPlugin):
         _make_executable(binary=cls.get_kotlin_language_server_binary())
 
 
-def download_kotlin_language_server(tag: Union[str, None], dst: str) -> None:
-    if tag is None:
-        return
-
+def download_kotlin_language_server(tag: str, dst: str) -> None:
     download_uri = LSP_KOTLIN_BASE_URL.format(tag=tag)
     try:
         with urlopen(download_uri) as response, open(os.path.join(dst, 'server.zip'), 'wb') as out_file:
             copyfileobj(response, out_file)
             
         _extract_zip(src=os.path.join(dst, 'server.zip'), dst=dst)
-    except URLError as ex:
-        raise ex
     except Exception as ex:
         raise ex
         
@@ -110,14 +102,8 @@ def _is_binary_available(path) -> bool:
     return bool(which(path))
 
 
-def to_int(value: Optional[str]) -> int:
-    if value is None:
-        return 0
-    return int(value)
-
-
 def get_setting(key: str, default=None) -> Any:
-    settings = sublime.load_settings('LSP-kotlin.sublime-settings')
+    settings = sublime.load_settings(SETTINGS_FILENAME)
     return settings.get(key, default)
 
 

@@ -2,7 +2,5 @@
 	"command": [
 		"${storage_path}/LSP-kotlin/server/bin/kotlin-language-server"
 	],
-	// selector should be lower case. Kotlin Syntax needs attention
-	"selector": "source.Kotlin",
-	"settings": {}
+	"selector": "source.Kotlin"
 }
