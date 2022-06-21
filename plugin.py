@@ -1,13 +1,12 @@
 import sublime
 
 from LSP.plugin import AbstractPlugin, register_plugin, unregister_plugin
-from LSP.plugin.core.typing import Any, Optional, Union
+from LSP.plugin.core.typing import Any, Optional
 
 from shutil import which, copyfileobj
 from urllib.request import urlopen
 import os
 import stat
-import re
 import zipfile
 
 TAG = '1.3.0'
@@ -79,14 +78,11 @@ class Kotlin(AbstractPlugin):
 
 def download_kotlin_language_server(tag: str, dst: str) -> None:
     download_uri = LSP_KOTLIN_BASE_URL.format(tag=tag)
-    try:
-        with urlopen(download_uri) as response, open(os.path.join(dst, 'server.zip'), 'wb') as out_file:
-            copyfileobj(response, out_file)
-            
-        _extract_zip(src=os.path.join(dst, 'server.zip'), dst=dst)
-    except Exception as ex:
-        raise ex
-        
+    with urlopen(download_uri) as response, open(os.path.join(dst, 'server.zip'), 'wb') as out_file:
+        copyfileobj(response, out_file)
+
+    _extract_zip(src=os.path.join(dst, 'server.zip'), dst=dst)
+
 
 def _make_executable(binary: str) -> None:
     st = os.stat(binary)

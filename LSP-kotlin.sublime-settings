@@ -2,5 +2,6 @@
 	"command": [
 		"${storage_path}/LSP-kotlin/server/bin/kotlin-language-server"
 	],
-	"selector": "source.Kotlin"
+	"selector": "source.Kotlin",
+	"settings": {}
 }
