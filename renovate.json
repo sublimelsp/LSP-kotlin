@@ -7,7 +7,7 @@
     {
       "fileMatch": ["/plugin.py$"],
       "matchStrings": [
-        "TAG PORTAINER_VERSION = '(?<currentValue>.+?)'"
+        "TAG = '(?<currentValue>.+?)'"
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fwcd/kotlin-language-server"
