@@ -3,9 +3,10 @@
   "extends": [
     "github>sublimelsp/renovate-preset"
   ],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["/plugin.py$"],
+      "customType": "regex",
+      "managerFilePatterns": ["/plugin.py$"],
       "matchStrings": [
         "TAG = '(?<currentValue>.+?)'"
       ],
