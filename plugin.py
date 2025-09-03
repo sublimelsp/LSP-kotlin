@@ -9,7 +9,7 @@ import os
 import stat
 import zipfile
 
-TAG = '1.3.3'
+TAG = '1.3.13'
 
 LSP_KOTLIN_BASE_URL = 'https://github.com/fwcd/kotlin-language-server/releases/download/{tag}/server.zip'
 SETTINGS_FILENAME = 'LSP-kotlin.sublime-settings'
