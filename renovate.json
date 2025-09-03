@@ -1,6 +1,23 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "github>sublimelsp/renovate-preset"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["/plugin.py$"],
+      "matchStrings": [
+        "TAG PORTAINER_VERSION = '(?<currentValue>.+?)'"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fwcd/kotlin-language-server"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["github-releases"],
+      "matchDepNames": ["fwcd/kotlin-language-server"],
+      "matchUpdateTypes": ["major", "minor", "patch"]
+    }
   ]
 }
