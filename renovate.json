@@ -8,7 +8,7 @@
       "customType": "regex",
       "managerFilePatterns": ["/plugin.py$"],
       "matchStrings": [
-        "TAG = '(?<currentValue>.+?)'"
+        "TAG = '(?<currentValue>[^']+)'"
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fwcd/kotlin-language-server"
