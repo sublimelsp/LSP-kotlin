@@ -13,12 +13,5 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fwcd/kotlin-language-server"
     }
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": ["github-releases"],
-      "matchDepNames": ["fwcd/kotlin-language-server"],
-      "matchUpdateTypes": ["major", "minor", "patch"]
-    }
   ]
 }
