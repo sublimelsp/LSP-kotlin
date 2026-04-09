@@ -1,13 +1,14 @@
-import sublime
+from __future__ import annotations
 
-from LSP.plugin import AbstractPlugin, register_plugin, unregister_plugin
-from LSP.plugin.core.typing import Any, Optional
-
-from shutil import which, copyfileobj
+from shutil import copyfileobj, which
+from typing import Any
 from urllib.request import urlopen
 import os
 import stat
 import zipfile
+
+from LSP.plugin import AbstractPlugin, register_plugin, unregister_plugin
+import sublime
 
 TAG = '1.3.13'
 
@@ -31,7 +32,7 @@ class Kotlin(AbstractPlugin):
         return TAG
 
     @classmethod
-    def current_server_version(cls) -> Optional[str]:
+    def current_server_version(cls) -> str | None:
         try:
             with open(os.path.join(cls.basedir(), 'VERSION'), 'r') as fp:
                 return fp.read()
