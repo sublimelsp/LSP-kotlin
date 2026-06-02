@@ -25,7 +25,7 @@ class Kotlin(AbstractPlugin):
 
     @classmethod
     def basedir(cls) -> str:
-        return os.path.join(cls.storage_path(), __package__)
+        return os.path.join(cls.storage_path(), str(__package__))
 
     @classmethod
     def server_version(cls) -> str:
