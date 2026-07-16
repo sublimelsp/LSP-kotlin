@@ -8,10 +8,12 @@
       "customType": "regex",
       "managerFilePatterns": ["/plugin.py$"],
       "matchStrings": [
-        "TAG = '(?<currentValue>[^']+)'"
+        "VERSION = '(?<currentValue>[^']+)'"
       ],
       "datasourceTemplate": "github-releases",
-      "depNameTemplate": "fwcd/kotlin-language-server"
+      "depNameTemplate": "Kotlin/kotlin-lsp",
+      "extractVersionTemplate": "^kotlin-lsp/v(?<version>.+)$",
+      "versioningTemplate": "loose"
     }
   ]
 }
