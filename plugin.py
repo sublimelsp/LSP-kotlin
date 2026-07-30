@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from shutil import copyfileobj, rmtree, which
+from shutil import rmtree, which
 from urllib.request import urlopen
 import os
 import subprocess
@@ -12,7 +12,7 @@ import sublime
 
 # Pinned Kotlin LSP release. Renovate keeps this in sync with the releases at
 # https://github.com/Kotlin/kotlin-lsp (see renovate.json).
-VERSION = '262.8190.0'
+VERSION = '262.9593.0'
 
 SETTINGS_FILENAME = 'LSP-kotlin.sublime-settings'
 SESSION_NAME = 'kotlin'
