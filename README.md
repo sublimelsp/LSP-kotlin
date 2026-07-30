@@ -26,11 +26,7 @@ downloading its own copy:
 
 ### Installation
 
-- Install [LSP][lsp-repo] and [LSP-kotlin][lsp-kotlin] from Package Control.
-- Install a Kotlin syntax so `.kt`/`.kts` files get the `source.kotlin` scope that this
-  package attaches to — Sublime Text has none built in. Install [Kotlin][kotlin-syntax] from
-  Package Control; despite the shared name, it is the maintained `guille/sublime-kotlin`
-  package, **not** the abandoned `vkostyukov/kotlin-sublime-package`.
+- Install [Kotlin][kotlin-syntax], [LSP][lsp-repo] and [LSP-kotlin][lsp-kotlin] from Package Control.
 - Restart Sublime and open a Kotlin file — the server downloads on first use.
 
 ### Configuration
