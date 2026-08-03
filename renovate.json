@@ -6,7 +6,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/plugin.py$"],
+      "managerFilePatterns": [
+        "/plugin.py$/"
+      ],
       "matchStrings": [
         "VERSION = '(?<currentValue>[^']+)'"
       ],
