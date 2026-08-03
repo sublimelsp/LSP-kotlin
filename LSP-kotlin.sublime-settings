@@ -1,12 +1,15 @@
 {
-	// The Kotlin LSP server is resolved automatically: if a "kotlin-lsp" binary is found
-	// on your PATH (e.g. installed via `brew install JetBrains/utils/kotlin-lsp`) it is
-	// used; otherwise a copy is downloaded and managed for you. To force a specific
-	// server, replace ${server_path} with an absolute path, e.g. "/opt/homebrew/bin/kotlin-lsp".
+	// The path to the server binary used to start the language server.
+	// Use `auto` for the package to manage (install/update) the server automatically.
+	// To force a specific server, :set to:
+	// - a binary name "kotlin-lsp" if it can be found on your PATH (e.g. installed via `brew install JetBrains/utils/kotlin-lsp`)
+	// - an absolute path, e.g. /opt/homebrew/bin/kotlin-lsp
+	// NOTE: Change this instead of directly updating `command` - the `${server_path}` variable is dynamically resolved based on this setting.
+	"server_path": "auto",
+
 	"command": [
 		"${server_path}",
 		"--stdio"
 	],
-	"selector": "source.kotlin",
-	"settings": {}
+	"selector": "source.kotlin"
 }
