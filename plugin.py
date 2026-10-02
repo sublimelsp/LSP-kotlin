@@ -14,7 +14,7 @@ import sublime
 
 # Pinned Kotlin LSP release. Renovate keeps this in sync with the releases at
 # https://github.com/Kotlin/kotlin-lsp (see renovate.json).
-VERSION = '262.9593.0'
+VERSION = '263.4702.0'
 
 # Server binary looked up on the PATH (e.g. installed via `brew install JetBrains/utils/kotlin-lsp`).
 BINARY_NAME = 'kotlin-lsp'
