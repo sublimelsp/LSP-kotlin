@@ -107,8 +107,9 @@ def _extract(archive_path: Path, dst: Path, version: str) -> Path:
         # the runtime, so use the system unzip (as Homebrew does) to preserve both.
         subprocess.check_call(['unzip', '-q', '-o', archive_path, '-d', dst])
     else:  # .win.zip - Windows build, no unix symlinks or permission bits to preserve
+        # Unlike the other archives it has no top-level kotlin-server-<version>/ folder.
         with zipfile.ZipFile(archive_path) as zip_ref:
-            zip_ref.extractall(dst)
+            zip_ref.extractall(dst / f'kotlin-server-{version}')
     return dst / f'kotlin-server-{version}'
 
 
