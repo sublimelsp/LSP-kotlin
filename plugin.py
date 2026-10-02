@@ -65,7 +65,7 @@ class Kotlin(LspPlugin):
 
     @classmethod
     def managed_binary(cls) -> Path:
-        binary = 'intellij-server.bat' if sublime.platform() == 'windows' else 'intellij-server'
+        binary = 'intellij-server.exe' if sublime.platform() == 'windows' else 'intellij-server'
         return cls.server_dir() / 'bin' / binary
 
 
