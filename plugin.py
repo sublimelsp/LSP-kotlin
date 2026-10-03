@@ -2,14 +2,25 @@ from __future__ import annotations
 
 from pathlib import Path
 from shutil import rmtree
+from typing import Any, Dict, TypeAlias, TypedDict
 from urllib.request import urlopen
 import os
 import subprocess
 import tarfile
 import zipfile
 
-from LSP.plugin import LspPlugin, OnPreStartContext
-from typing_extensions import override
+from LSP.plugin import (
+    Error,
+    LspPlugin,
+    LspWindowCommand,
+    OnPreStartContext,
+    Promise,
+    Request,
+    notification_handler,
+    request_handler,
+)
+from LSP.protocol import LSPErrorCodes, MessageActionItem, ShowMessageRequestParams
+from typing_extensions import Never, override
 import sublime
 
 # Pinned Kotlin LSP release. Renovate keeps this in sync with the releases at
@@ -22,8 +33,51 @@ BINARY_NAME = 'kotlin-lsp'
 # JetBrains distributes the standalone server as per-platform archives on their CDN.
 DOWNLOAD_URL = 'https://download-cdn.jetbrains.com/language-server/kotlin-server/{version}/{archive}'
 
+# Message request actions that only work in the VS Code extension, e.g. "Configure…" opens VS Code settings.
+VSCODE_ONLY_ACTION_TITLES = {'Configure…', 'Configure...'}
+
+CHOOSE_BUILD_TOOL_MESSAGE = 'LSP-kotlin: Run "LSP-kotlin: Choose Build Tool" to start project import.'
+
+
+class BlockedWorkspaceFolder(TypedDict):
+    folderUri: str
+    reason: str
+    candidates: list[str]
+    dismissed: bool
+
+
+class WorkspaceImportStatus(TypedDict):
+    blockedFolders: list[BlockedWorkspaceFolder]
+
+
+class WorkspaceImportStatusRequest:
+    Type = 'intellij/workspaceImportStatus'
+    Params: TypeAlias = Dict[str, Never]
+    Response: TypeAlias = WorkspaceImportStatus
+
+    @classmethod
+    def create(cls) -> Request[Params, Response]:
+        return Request(cls.Type, {})
+
+
+class WorkspaceImportStatusNotification:
+    Type = 'intellij/workspaceImportStatus'
+
+
+class ReloadWorkspaceRequest:
+    Type = 'intellij/reloadWorkspace'
+    Params: TypeAlias = Dict[str, Any]
+    Response: TypeAlias = None
+
+    @classmethod
+    def create(cls, params: Params) -> Request[Params, Response]:
+        return Request(cls.Type, params)
+
 
 class Kotlin(LspPlugin):
+
+    _live_import_status_received = False
+    _import_prompt_dismissed = False
 
     @classmethod
     @override
@@ -33,6 +87,45 @@ class Kotlin(LspPlugin):
             cls.install_server()
             server_path = str(cls.managed_binary())
         context.variables.update({'server_path': server_path})
+        build_tool = context.configuration.root_settings.get('build_tool')
+        if isinstance(build_tool, str):
+            build_tools = {folder.uri(): build_tool for folder in context.workspace_folders}
+            context.configuration.initialization_options.set('buildTools', build_tools)
+
+    @override
+    def on_initialized_async(self) -> None:
+        if session := self.weaksession():
+            # Seeds the state in case the server published it before our handler could see it.
+            session.send_request_task(WorkspaceImportStatusRequest.create()).then(
+                lambda status: self._handle_workspace_import_status(status, live=False))
+
+    @request_handler('window/showMessageRequest')
+    def on_window_show_message_request(self, params: ShowMessageRequestParams) -> Promise[MessageActionItem | None]:
+        if not (session := self.weaksession()) or not (manager := session.manager()):
+            return Promise.resolve(None)
+        if actions := params.get('actions'):
+            params['actions'] = [action for action in actions if action['title'] not in VSCODE_ONLY_ACTION_TITLES]
+        return manager.handle_message_request(session.config.name, params)
+
+    @notification_handler(WorkspaceImportStatusNotification.Type)
+    def on_workspace_import_status(self, params: WorkspaceImportStatus) -> None:
+        self._handle_workspace_import_status(params, live=True)
+
+    def _handle_workspace_import_status(self, status: WorkspaceImportStatus | Error, *, live: bool) -> None:
+        if not (session := self.weaksession()) or isinstance(status, Error):
+            return
+        if live:
+            self._live_import_status_received = True
+        elif self._live_import_status_received:
+            # A live notification is newer than the answer to the initial request.
+            return
+        conflicts = [f for f in status.get('blockedFolders', []) if f.get('reason') == 'ambiguousBuildSystem']
+        session.set_config_status_async('build tool required' if conflicts else '')
+        dismissed = any(f.get('dismissed') for f in conflicts)
+        newly_dismissed = dismissed and not self._import_prompt_dismissed
+        self._import_prompt_dismissed = dismissed
+        if newly_dismissed:
+            session.window.status_message(CHOOSE_BUILD_TOOL_MESSAGE)
 
     @classmethod
     def install_server(cls) -> None:
@@ -67,6 +160,26 @@ class Kotlin(LspPlugin):
     def managed_binary(cls) -> Path:
         binary = 'intellij-server.exe' if sublime.platform() == 'windows' else 'intellij-server'
         return cls.server_dir() / 'bin' / binary
+
+
+class LspKotlinReloadWorkspaceCommand(LspWindowCommand):
+    """Reload the workspace. When the build tool is ambiguous, the server asks which one to import."""
+
+    def run(self) -> None:
+        sublime.set_timeout_async(self._run_async)
+
+    def _run_async(self) -> None:
+        if not (session := self.session()):
+            return
+        params = {'initializationOptions': session.config.initialization_options.get()}
+        session.send_request_task(ReloadWorkspaceRequest.create(params)).then(_on_reload_done)
+
+
+def _on_reload_done(result: None | Error) -> None:
+    if not isinstance(result, Error):
+        sublime.status_message('LSP-kotlin: workspace reloaded')
+    elif result.code not in (LSPErrorCodes.RequestCancelled, LSPErrorCodes.ServerCancelled):
+        sublime.error_message(f'LSP-kotlin: failed to reload the workspace: {result}')
 
 
 def _archive_name(version: str) -> str:

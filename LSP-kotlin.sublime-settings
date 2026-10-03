@@ -7,6 +7,12 @@
 	// NOTE: Change this instead of directly updating `command` - the `${server_path}` variable is dynamically resolved based on this setting.
 	"server_path": "auto",
 
+	// The build tool used to import the project, e.g. "gradle" or "maven".
+	// - null: detect the build tool automatically. If more than one is found, the server asks which one to use.
+	// - "": do not import the project.
+	// Set it per project in the project settings to store the choice for that project.
+	"build_tool": null,
+
 	"command": [
 		"${server_path}",
 		"--stdio"

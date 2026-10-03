@@ -15,6 +15,12 @@
                   "default": "auto",
                   "markdownDescription": "The path to the server binary to use for starting the language server. Use `auto` for the package to manage (install/update) server automatically.\n\n> [!NOTE]\n> Change this instead of directly updating `command` - the `${server_path}` variable is dynamically resolved based on this setting.\n\n> [!WARNING]\n> Using custom binary could result in package settings not matching what server supports."
                 },
+                "build_tool": {
+                  "type": ["string", "null"],
+                  "default": null,
+                  "examples": ["gradle", "maven"],
+                  "markdownDescription": "The build tool used to import the project, e.g. `\"gradle\"` or `\"maven\"`.\n\n- `null`: detect the build tool automatically. If more than one is found, the server asks which one to use.\n- `\"\"`: do not import the project.\n\nSet it in the project settings to store the choice for one project."
+                },
               },
             },
           },
