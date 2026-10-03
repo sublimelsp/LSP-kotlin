@@ -7,4 +7,12 @@
             "default": "// Settings in here override those in \"LSP-kotlin/LSP-kotlin.sublime-settings\"\n\n{\n\t$0\n}\n",
         },
     },
+    {
+        "caption": "LSP-kotlin: Reload Workspace",
+        "command": "lsp_kotlin_reload_workspace",
+    },
+    {
+        "caption": "LSP-kotlin: Choose Build Tool",
+        "command": "lsp_kotlin_reload_workspace",
+    },
 ]

@@ -45,9 +45,28 @@ server, replace `${server_path}` with an absolute path:
 }
 ```
 
-## Settings
+### Build tool
 
-The language server doesn't expose customizable settings at the moment.
+The server detects the build tool of the project automatically. When it finds more than one
+(for example both `build.gradle.kts` and `pom.xml`), it asks which one to use, and the status
+bar shows `build tool required` until you choose. To see the question again, run
+`LSP-kotlin: Choose Build Tool` from the command palette.
+
+To store the choice, set `build_tool` in the project settings (`Project > Edit Project`):
+
+```json
+{
+	"settings": {
+		"LSP": {
+			"LSP-kotlin": {
+				"build_tool": "gradle"
+			}
+		}
+	}
+}
+```
+
+Use `null` (the default) to detect the build tool automatically, or `""` to not import the project.
 
 [lsp-repo]: https://packagecontrol.io/packages/LSP
 [lsp-kotlin]: https://packagecontrol.io/packages/LSP-kotlin
