@@ -9,7 +9,16 @@ import subprocess
 import tarfile
 import zipfile
 
-from LSP.plugin import Error, LspPlugin, LspWindowCommand, OnPreStartContext, Promise, Request, notification_handler, request_handler
+from LSP.plugin import (
+    Error,
+    LspPlugin,
+    LspWindowCommand,
+    OnPreStartContext,
+    Promise,
+    Request,
+    notification_handler,
+    request_handler,
+)
 from LSP.protocol import LSPErrorCodes, MessageActionItem, ShowMessageRequestParams
 from typing_extensions import Never, override
 import sublime
