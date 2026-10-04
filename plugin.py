@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, TypeAlias, TypedDict, cast
+from typing import Any, Dict, TypeAlias, TypedDict
 from urllib.request import urlopen
 import os
 import subprocess
@@ -14,14 +14,11 @@ from LSP.plugin import (
     LspPlugin,
     LspWindowCommand,
     OnPreStartContext,
-    Promise,
     Request,
     ServerRequest,
     notification_handler,
-    request_handler,
 )
-from LSP.plugin.core.protocol import ShowMessageRequest
-from LSP.protocol import LSPErrorCodes, MessageActionItem, ShowMessageRequestParams
+from LSP.protocol import LSPErrorCodes
 from typing_extensions import Never, override
 import sublime
 
@@ -103,9 +100,7 @@ class Kotlin(LspPlugin):
 
     @override
     def on_server_request_async(self, request: ServerRequest) -> None:
-        if not (session := self.weaksession()) or not (manager := session.manager()):
-            return
-        if request['method'] == 'window/showMessageRequest' and (actions := request.get('params', {}).get('actions')):
+        if request['method'] == 'window/showMessageRequest' and (actions := request['params'].get('actions')):
             filtered_actions = [action for action in actions if action['title'] not in VSCODE_ONLY_ACTION_TITLES]
             actions.clear()
             actions.extend(filtered_actions)
