@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, TypeAlias, TypedDict
+from typing import Any, Awaitable, Dict, TypeAlias, TypedDict
 from urllib.request import urlopen
 import os
 import subprocess
@@ -100,7 +100,7 @@ class Kotlin(LspPlugin):
                 lambda status: self._handle_workspace_import_status(status, live=False))
 
     @request_handler('window/showMessageRequest')
-    def on_window_show_message_request(self, params: ShowMessageRequestParams) -> Promise[MessageActionItem | None]:
+    def on_window_show_message_request(self, params: ShowMessageRequestParams) -> Awaitable[MessageActionItem | None]:
         if not (session := self.weaksession()) or not (manager := session.manager()):
             return Promise.resolve(None)
         if actions := params.get('actions'):
