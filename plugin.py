@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, TypeAlias, TypedDict
+from typing import Any, Dict, TypeAlias, TypedDict, cast
 from urllib.request import urlopen
 import os
 import subprocess
@@ -16,9 +16,11 @@ from LSP.plugin import (
     OnPreStartContext,
     Promise,
     Request,
+    ServerRequest,
     notification_handler,
     request_handler,
 )
+from LSP.plugin.core.protocol import ShowMessageRequest
 from LSP.protocol import LSPErrorCodes, MessageActionItem, ShowMessageRequestParams
 from typing_extensions import Never, override
 import sublime
@@ -99,13 +101,14 @@ class Kotlin(LspPlugin):
             session.send_request_task(WorkspaceImportStatusRequest.create()).then(
                 lambda status: self._handle_workspace_import_status(status, live=False))
 
-    @request_handler('window/showMessageRequest')
-    def on_window_show_message_request(self, params: ShowMessageRequestParams) -> Promise[MessageActionItem | None]:
+    @override
+    def on_server_request_async(self, request: ServerRequest) -> None:
         if not (session := self.weaksession()) or not (manager := session.manager()):
-            return Promise.resolve(None)
-        if actions := params.get('actions'):
-            params['actions'] = [action for action in actions if action['title'] not in VSCODE_ONLY_ACTION_TITLES]
-        return manager.handle_message_request(session.config.name, params)
+            return
+        if request['method'] == 'window/showMessageRequest' and (actions := request.get('params', {}).get('actions')):
+            filtered_actions = [action for action in actions if action['title'] not in VSCODE_ONLY_ACTION_TITLES]
+            actions.clear()
+            actions.extend(filtered_actions)
 
     @notification_handler(WorkspaceImportStatusNotification.Type)
     def on_workspace_import_status(self, params: WorkspaceImportStatus) -> None:
