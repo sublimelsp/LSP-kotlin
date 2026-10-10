@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from shutil import rmtree
 from typing import Any, Dict, TypeAlias, TypedDict
+from urllib.error import URLError
 from urllib.request import urlopen
 import os
 import subprocess
@@ -29,8 +30,8 @@ VERSION = '263.6379.0'
 # Server binary looked up on the PATH (e.g. installed via `brew install JetBrains/utils/kotlin-lsp`).
 BINARY_NAME = 'kotlin-lsp'
 
-# JetBrains distributes the standalone server as per-platform archives on their CDN.
-DOWNLOAD_URL = 'https://download-cdn.jetbrains.com/language-server/kotlin-server/{version}/{archive}'
+# JetBrains distributes the standalone server as per-platform archives (see the release notes for links).
+DOWNLOAD_URL = 'https://download.jetbrains.com/language-server/kotlin-server/{version}/{archive}'
 
 # Message request actions that only work in the VS Code extension, e.g. "Configure…" opens VS Code settings.
 VSCODE_ONLY_ACTION_TITLES = {'Configure…', 'Configure...'}
@@ -193,7 +194,12 @@ def _archive_name(version: str) -> str:
 
 
 def _download(url: str, dst: Path) -> None:
-    with urlopen(url) as response:  # noqa: S310 - trusted JetBrains CDN over https
+    try:
+        response = urlopen(url)  # noqa: S310 - trusted JetBrains download server over https
+    except URLError as ex:
+        # HTTPError's message (e.g. "HTTP Error 404: Not Found") doesn't include the URL.
+        raise RuntimeError(f'Failed to download {url}: {ex}') from ex
+    with response:
         total = int(response.headers.get('Content-Length') or 0)
         read = 0
         with open(dst, 'wb') as out_file:
