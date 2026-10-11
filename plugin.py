@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, TypeAlias, TypedDict
+from typing import Any, Dict, TypedDict
 from urllib.error import URLError
 from urllib.request import urlopen
 import os
@@ -20,7 +20,7 @@ from LSP.plugin import (
     notification_handler,
 )
 from LSP.protocol import LSPErrorCodes
-from typing_extensions import Never, override
+from typing_extensions import Never, TypeAlias, override
 import sublime
 
 # Pinned Kotlin LSP release. Renovate keeps this in sync with the releases at
