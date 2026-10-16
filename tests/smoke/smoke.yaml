@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/sublimelsp/lsp_smoke_test/v1/smoke.schema.json
-file: Main.kt
+file: src/main/kotlin/Main.kt
+# The server only checks files of a project it has imported, so the fixture is a Maven project.
 # A type mismatch.
 expected_diagnostics:
   severity: 1
