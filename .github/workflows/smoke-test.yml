@@ -13,4 +13,4 @@ jobs:
     with:
       # Provides the Kotlin syntax, which Sublime Text doesn't include.
       extra-packages: |
-        guille/sublime-kotlin
+        Kotlin
